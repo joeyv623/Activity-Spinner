@@ -1,61 +1,1284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activity Spinner App</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
-        #spinner {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 10px solid #3498db;
-            border-top: 10px solid transparent;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #activity {
-            margin-top: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Philly Family HQ 🎡</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   GLOBAL TOKENS & RESET
+═══════════════════════════════════════════════ */
+:root {
+  --black:   #0D0D0D;
+  --white:   #FFFBF2;
+  --gold:    #F5C518;
+  --gold-dk: #C49A10;
+
+  /* Section accent colors */
+  --act-bg:    #0F2027;
+  --act-mid:   #1A3A2A;
+  --act-accent:#4ADE80;
+  --act-sun:   #FACC15;
+
+  --place-bg:  #0A0A2E;
+  --place-mid: #1A1A4A;
+  --place-accent:#60A5FA;
+  --place-hot: #F472B6;
+
+  --food-bg:   #1A0A00;
+  --food-mid:  #2D1200;
+  --food-accent:#F97316;
+  --food-gold: #FCD34D;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,13,13,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(245,197,24,0.2);
+  padding: 0 24px;
+  height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.nav-links { display: flex; gap: 6px; }
+.nav-link {
+  font-weight: 800; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 7px 14px; border-radius: 50px;
+  text-decoration: none; color: rgba(255,251,242,0.6);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--white); border-color: rgba(245,197,24,0.3); }
+.nav-link.act   { color: var(--act-accent); }
+.nav-link.place { color: var(--place-accent); }
+.nav-link.food  { color: var(--food-accent); }
+@media(max-width:540px) {
+  .nav-link span { display: none; }
+  .nav-link { padding: 7px 10px; font-size: 1rem; }
+}
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 100px 24px 60px;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, #1a1a1a 0%, #0D0D0D 100%);
+}
+
+/* Animated gradient orbs */
+.hero::before, .hero::after {
+  content: ''; position: absolute; border-radius: 50%;
+  filter: blur(80px); pointer-events: none; animation: orb 10s ease-in-out infinite alternate;
+}
+.hero::before {
+  width: 600px; height: 400px; top: -100px; left: -150px;
+  background: radial-gradient(circle, rgba(74,222,128,0.12), transparent 70%);
+}
+.hero::after {
+  width: 500px; height: 400px; bottom: -100px; right: -100px;
+  background: radial-gradient(circle, rgba(96,165,250,0.12), transparent 70%);
+  animation-delay: -5s;
+}
+@keyframes orb { from{transform:translate(0,0)} to{transform:translate(40px,30px)} }
+
+/* dot grid */
+.hero-dots {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 780px; }
+
+.hero-eyebrow {
+  font-weight: 800; font-size: 0.78rem;
+  letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  opacity: 0; animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(3.5rem, 11vw, 7.5rem);
+  line-height: 0.92;
+  margin-bottom: 20px;
+  opacity: 0; animation: fadeUp 0.6s 0.35s ease both;
+}
+.hero-title .line1 { color: var(--act-accent); display: block; }
+.hero-title .line2 { color: var(--white); display: block; }
+.hero-title .line3 { color: var(--gold); display: block; }
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 600; line-height: 1.6;
+  color: rgba(255,251,242,0.6);
+  max-width: 520px; margin: 0 auto 40px;
+  opacity: 0; animation: fadeUp 0.6s 0.5s ease both;
+}
+
+.hero-cards {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp 0.6s 0.65s ease both;
+}
+.hero-card {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 18px 22px; border-radius: 16px;
+  text-decoration: none; gap: 8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 130px;
+}
+.hero-card:hover { transform: translateY(-4px); }
+.hero-card .icon { font-size: 2.2rem; }
+.hero-card .label {
+  font-family: 'Fredoka One', cursive;
+  font-size: 0.95rem; letter-spacing: 0.05em;
+  line-height: 1.2; text-align: center;
+}
+.hero-card.act  { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.25); color: var(--act-accent); box-shadow: 0 0 30px rgba(74,222,128,0.08); }
+.hero-card.act:hover { box-shadow: 0 8px 40px rgba(74,222,128,0.2); }
+.hero-card.place { background: rgba(96,165,250,0.08); border-color: rgba(96,165,250,0.25); color: var(--place-accent); box-shadow: 0 0 30px rgba(96,165,250,0.08); }
+.hero-card.place:hover { box-shadow: 0 8px 40px rgba(96,165,250,0.2); }
+.hero-card.food  { background: rgba(249,115,22,0.08); border-color: rgba(249,115,22,0.25); color: var(--food-accent); box-shadow: 0 0 30px rgba(249,115,22,0.08); }
+.hero-card.food:hover { box-shadow: 0 8px 40px rgba(249,115,22,0.2); }
+
+.scroll-hint {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,251,242,0.3); font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  animation: bounce 2s ease-in-out infinite;
+  opacity: 0; animation: fadeUp 0.6s 1s ease both, bounce 2s 1.6s ease-in-out infinite;
+}
+.scroll-hint::after { content: '↓'; font-size: 1rem; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes bounce {
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-6px)}
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION SHELL (shared by all 3 spinners)
+═══════════════════════════════════════════════ */
+.spinner-section {
+  min-height: 100vh;
+  padding: 80px 20px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Section header */
+.section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 48px;
+}
+.section-tag {
+  display: inline-block;
+  font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 50px;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 0.95;
+  margin-bottom: 12px;
+}
+.section-sub {
+  font-size: 1rem; font-weight: 600;
+  line-height: 1.6;
+  color: rgba(255,251,242,0.5);
+}
+
+/* Spinner layout: wheel + result side by side on desktop */
+.spinner-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media(max-width:800px) { .spinner-layout { grid-template-columns: 1fr; } }
+
+.spinner-left { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.spinner-right { display: flex; flex-direction: column; gap: 20px; }
+
+/* Filters card */
+.filters-card {
+  width: 100%;
+  border-radius: 16px;
+  padding: 20px 22px 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.filters-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.1rem; letter-spacing: 0.15em;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.filters-title::after { content:''; flex:1; height:1px; background: rgba(255,255,255,0.08); }
+
+.filter-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.filter-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+@media(max-width:500px) {
+  .filter-grid-2, .filter-grid-3 { grid-template-columns: 1fr 1fr; }
+}
+
+.fg label {
+  display: block; font-weight: 800; font-size: 0.68rem;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+/* Custom multi-select */
+.ms-wrap { position: relative; width: 100%; }
+.ms-trigger {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: 0.85rem;
+  cursor: pointer; text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  transition: border-color 0.2s;
+  min-height: 36px;
+}
+.ms-trigger:hover { border-color: rgba(255,255,255,0.3); }
+.ms-trigger.open { border-color: rgba(255,255,255,0.4); border-radius: 8px 8px 0 0; }
+.ms-trigger-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem; }
+.ms-trigger-text.placeholder { color: rgba(255,255,255,0.35); }
+.ms-count {
+  background: rgba(255,255,255,0.2);
+  border-radius: 50px; padding: 1px 7px;
+  font-size: 0.72rem; font-weight: 900; flex-shrink: 0;
+}
+.ms-arrow { font-size: 0.6rem; opacity: 0.5; flex-shrink: 0; transition: transform 0.2s; }
+.ms-trigger.open .ms-arrow { transform: rotate(180deg); }
+.ms-dropdown {
+  display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
+  background: #1e1e2e;
+  border: 1px solid rgba(255,255,255,0.15); border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 220px; overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.ms-dropdown.open { display: block; }
+.ms-dropdown::-webkit-scrollbar { width: 4px; }
+.ms-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.ms-option {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 12px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600; font-size: 0.83rem;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer; transition: background 0.1s; user-select: none;
+}
+.ms-option:hover { background: rgba(255,255,255,0.07); color: white; }
+.ms-option.selected { color: white; }
+.ms-checkbox {
+  width: 15px; height: 15px; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.3); border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 900; transition: all 0.15s;
+}
+.ms-option.selected .ms-checkbox { border-color: currentColor; background: currentColor; color: #111; }
+
+.filter-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 12px;
+}
+.match-pill {
+  font-weight: 800; font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: rgba(255,251,242,0.35);
+}
+.match-pill strong { color: inherit; opacity: 1; }
+.reset-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800; font-size: 0.72rem;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,251,242,0.3);
+  background: none; border: 1px solid rgba(255,255,255,0.1);
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  transition: all 0.15s;
+}
+.reset-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+/* Wheel */
+.wheel-wrap {
+  position: relative;
+  width: min(340px, 88vw);
+  height: min(340px, 88vw);
+  flex-shrink: 0;
+}
+.wheel-pointer {
+  position: absolute; top: -20px; left: 50%;
+  transform: translateX(-50%); z-index: 10;
+  width: 0; height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+}
+.wheel-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.12);
+  z-index: 5; pointer-events: none;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+}
+canvas.wheel {
+  width: 100%; height: 100%;
+  border-radius: 50%; display: block;
+  position: relative; z-index: 2;
+}
+.wheel-hub {
+  position: absolute; top:50%; left:50%;
+  transform: translate(-50%,-50%);
+  width: 54px; height: 54px;
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 1.5rem; z-index: 10;
+  border: 3px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Spin button */
+.spin-btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  letter-spacing: 0.06em;
+  padding: 15px 56px;
+  border-radius: 50px;
+  border: none; cursor: pointer;
+  position: relative; top: 0;
+  transition: all 0.12s;
+}
+.spin-btn:active { top: 5px; }
+.spin-btn:disabled { opacity: 0.4; cursor: not-allowed; top: 0; }
+
+.no-match-msg {
+  font-weight: 800; font-size: 0.9rem; letter-spacing: 0.06em;
+  text-align: center; display: none;
+}
+
+/* Result card */
+.result-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: none;
+  animation: popIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+.result-card.show { display: block; }
+@keyframes popIn {
+  from{opacity:0;transform:scale(0.94) translateY(16px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+.result-top {
+  padding: 18px 22px 14px;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 12px;
+}
+.result-lbl {
+  font-weight: 800; font-size: 0.66rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  opacity: 0.6; margin-bottom: 4px;
+}
+.result-name {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  line-height: 1.05; color: var(--white);
+}
+.result-emoji-big { font-size: 2.8rem; flex-shrink: 0; }
+.result-badges { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 22px 14px; }
+.rbadge {
+  font-weight: 800; font-size: 0.7rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 50px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--white);
+}
+.result-body { padding: 14px 22px 20px; display: flex; flex-direction: column; gap: 12px; }
+.rf label {
+  font-weight: 800; font-size: 0.67rem;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  opacity: 0.5; display: block; margin-bottom: 3px;
+}
+.rf p { font-size: 0.9rem; font-weight: 600; line-height: 1.45; }
+.result-actions { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 22px 20px; }
+.raction {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800; font-size: 0.8rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 9px 16px; border-radius: 8px;
+  text-decoration: none; border: 2px solid;
+  transition: all 0.15s; cursor: pointer; background: transparent;
+}
+
+/* confetti */
+#confetti { position:fixed; inset:0; pointer-events:none; z-index:9999; }
+
+/* ═══════════════════════════════════════════════
+   SECTION 1 — ACTIVITIES (green)
+═══════════════════════════════════════════════ */
+#activities {
+  background: var(--act-bg);
+  scroll-margin-top: 58px;
+}
+#activities::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 70% 50% at 80% 30%, rgba(74,222,128,0.07), transparent);
+  pointer-events:none;
+}
+#activities .section-tag { background: rgba(74,222,128,0.12); color: var(--act-accent); border: 1px solid rgba(74,222,128,0.25); }
+#activities .section-title { color: var(--act-accent); }
+#activities .filters-card { background: rgba(255,255,255,0.03); }
+#activities .filters-title { color: var(--act-accent); }
+#activities .fg label { color: rgba(74,222,128,0.7); }
+#activities .fg select:hover, #activities .fg select:focus { border-color: rgba(74,222,128,0.4); }
+#activities .match-pill strong { color: var(--act-accent); }
+#activities .wheel-pointer { border-top-color: var(--act-accent); filter: drop-shadow(0 0 8px rgba(74,222,128,0.8)); }
+#activities .wheel-ring { border-color: rgba(74,222,128,0.25); box-shadow: 0 0 30px rgba(74,222,128,0.1), inset 0 0 40px rgba(0,0,0,0.5); }
+#activities .wheel-hub { background: var(--act-bg); border-color: rgba(74,222,128,0.4); box-shadow: 0 0 20px rgba(74,222,128,0.3); }
+#activities .spin-btn { background: var(--act-accent); color: #0F2027; box-shadow: 0 6px 0 #16a34a, 0 0 30px rgba(74,222,128,0.3); }
+#activities .spin-btn:hover { background: #6ee7a0; box-shadow: 0 6px 0 #16a34a, 0 0 50px rgba(74,222,128,0.4); }
+#activities .spin-btn:active { box-shadow: 0 1px 0 #16a34a; }
+#activities .no-match-msg { color: var(--act-accent); }
+#activities .result-card { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.2); }
+#activities .result-top { background: rgba(74,222,128,0.1); border-bottom: 2px solid rgba(74,222,128,0.25); }
+#activities .rf label { color: rgba(74,222,128,0.6); }
+#activities .raction { color: var(--act-accent); border-color: rgba(74,222,128,0.4); }
+#activities .raction:hover { background: var(--act-accent); color: #0F2027; }
+
+/* ═══════════════════════════════════════════════
+   SECTION 2 — PLACES (blue/purple)
+═══════════════════════════════════════════════ */
+#places {
+  background: var(--place-bg);
+  scroll-margin-top: 58px;
+}
+#places::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 50% at 20% 60%, rgba(96,165,250,0.07), transparent);
+  pointer-events:none;
+}
+#places .section-tag { background: rgba(96,165,250,0.12); color: var(--place-accent); border: 1px solid rgba(96,165,250,0.25); }
+#places .section-title { color: var(--place-accent); }
+#places .filters-card { background: rgba(255,255,255,0.03); }
+#places .filters-title { color: var(--place-accent); }
+#places .fg label { color: rgba(96,165,250,0.7); }
+#places .fg select:hover, #places .fg select:focus { border-color: rgba(96,165,250,0.4); }
+#places .match-pill strong { color: var(--place-accent); }
+#places .wheel-pointer { border-top-color: var(--place-hot); filter: drop-shadow(0 0 8px rgba(244,114,182,0.9)); }
+#places .wheel-ring { border-color: rgba(96,165,250,0.25); box-shadow: 0 0 30px rgba(96,165,250,0.1), inset 0 0 40px rgba(0,0,0,0.5); }
+#places .wheel-hub { background: var(--place-bg); border-color: rgba(96,165,250,0.4); box-shadow: 0 0 20px rgba(96,165,250,0.3); }
+#places .spin-btn { background: var(--place-accent); color: #0A0A2E; box-shadow: 0 6px 0 #1d4ed8, 0 0 30px rgba(96,165,250,0.3); }
+#places .spin-btn:hover { background: #93c5fd; box-shadow: 0 6px 0 #1d4ed8, 0 0 50px rgba(96,165,250,0.4); }
+#places .spin-btn:active { box-shadow: 0 1px 0 #1d4ed8; }
+#places .no-match-msg { color: var(--place-hot); }
+#places .result-card { background: rgba(96,165,250,0.05); border-color: rgba(96,165,250,0.2); }
+#places .result-top { background: rgba(96,165,250,0.1); border-bottom: 2px solid rgba(96,165,250,0.25); }
+#places .rf label { color: rgba(96,165,250,0.6); }
+#places .raction { color: var(--place-accent); border-color: rgba(96,165,250,0.4); }
+#places .raction:hover { background: var(--place-accent); color: #0A0A2E; }
+
+/* ═══════════════════════════════════════════════
+   SECTION 3 — FOOD (orange)
+═══════════════════════════════════════════════ */
+#food {
+  background: var(--food-bg);
+  scroll-margin-top: 58px;
+}
+#food::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 65% 50% at 70% 40%, rgba(249,115,22,0.08), transparent);
+  pointer-events:none;
+}
+#food .section-tag { background: rgba(249,115,22,0.12); color: var(--food-accent); border: 1px solid rgba(249,115,22,0.25); }
+#food .section-title { color: var(--food-accent); }
+#food .filters-card { background: rgba(255,255,255,0.03); }
+#food .filters-title { color: var(--food-accent); }
+#food .fg label { color: rgba(249,115,22,0.7); }
+#food .fg select:hover, #food .fg select:focus { border-color: rgba(249,115,22,0.4); }
+#food .match-pill strong { color: var(--food-accent); }
+#food .wheel-pointer { border-top-color: var(--food-gold); filter: drop-shadow(0 0 8px rgba(252,211,77,0.9)); }
+#food .wheel-ring { border-color: rgba(249,115,22,0.3); box-shadow: 0 0 30px rgba(249,115,22,0.1), inset 0 0 40px rgba(0,0,0,0.5); }
+#food .wheel-hub { background: var(--food-bg); border-color: rgba(249,115,22,0.4); box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+#food .spin-btn { background: var(--food-accent); color: #1A0A00; box-shadow: 0 6px 0 #c2410c, 0 0 30px rgba(249,115,22,0.3); }
+#food .spin-btn:hover { background: #fb923c; box-shadow: 0 6px 0 #c2410c, 0 0 50px rgba(249,115,22,0.4); }
+#food .spin-btn:active { box-shadow: 0 1px 0 #c2410c; }
+#food .no-match-msg { color: var(--food-accent); }
+#food .result-card { background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.2); }
+#food .result-top { background: rgba(249,115,22,0.1); border-bottom: 2px solid rgba(249,115,22,0.25); }
+#food .rf label { color: rgba(249,115,22,0.6); }
+#food .raction { color: var(--food-accent); border-color: rgba(249,115,22,0.4); }
+#food .raction:hover { background: var(--food-accent); color: #1A0A00; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  background: #080808;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 40px 24px;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.8rem; color: var(--gold);
+  margin-bottom: 8px;
+}
+.footer-sub {
+  font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,251,242,0.2);
+}
+.footer-links {
+  display: flex; gap: 24px; justify-content: center;
+  margin-top: 20px;
+}
+.footer-link {
+  font-weight: 700; font-size: 0.78rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  opacity: 0.35;
+}
+.footer-link:hover { opacity: 0.8; }
+.footer-link.act { color: var(--act-accent); }
+.footer-link.place { color: var(--place-accent); }
+.footer-link.food { color: var(--food-accent); }
+
+/* Section-colored multi-select accents */
+#activities .ms-trigger:hover, #activities .ms-trigger.open { border-color: rgba(74,222,128,0.5); }
+#activities .ms-option.selected { color: var(--act-accent); }
+#activities .ms-option:hover { background: rgba(74,222,128,0.07); }
+#activities .ms-count { background: rgba(74,222,128,0.25); color: var(--act-accent); }
+
+#places .ms-trigger:hover, #places .ms-trigger.open { border-color: rgba(96,165,250,0.5); }
+#places .ms-option.selected { color: var(--place-accent); }
+#places .ms-option:hover { background: rgba(96,165,250,0.07); }
+#places .ms-count { background: rgba(96,165,250,0.25); color: var(--place-accent); }
+
+#food .ms-trigger:hover, #food .ms-trigger.open { border-color: rgba(249,115,22,0.5); }
+#food .ms-option.selected { color: var(--food-accent); }
+#food .ms-option:hover { background: rgba(249,115,22,0.07); }
+#food .ms-count { background: rgba(249,115,22,0.25); color: var(--food-accent); }
+</style>
 </head>
 <body>
-    <div id="spinner"></div>
-    <div id="activity">Spin to find an activity!</div>
-    <script>
-        const activities = [
-            'Go for a walk',
-            'Do some yoga',
-            'Read a book',
-            'Learn a new language',
-            'Cook a new recipe',
-            'Watch a movie',
-            'Do some gardening',
-            'Take a nap',
-            'Try a new workout',
-            'Call a friend'
-        ];
 
-        const spinner = document.getElementById('spinner');
-        const activityDisplay = document.getElementById('activity');
+<canvas id="confetti"></canvas>
 
-        spinner.addEventListener('click', () => {
-            const randomIndex = Math.floor(Math.random() * activities.length);
-            activityDisplay.innerText = activities[randomIndex];
-        });
-    </script>
+<!-- NAV -->
+<nav>
+  <a href="#" onclick="scrollTo('hero');return false;" class="nav-logo">🎡 Philly Family HQ</a>
+  <div class="nav-links">
+    <a href="#" onclick="scrollTo('activities');return false;" class="nav-link act">🎮 <span>Activities</span></a>
+    <a href="#" onclick="scrollTo('places');return false;" class="nav-link place">🗺 <span>Places</span></a>
+    <a href="#" onclick="scrollTo('food');return false;" class="nav-link food">🥩 <span>Takeout</span></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Your Philly Family Decision Engine</div>
+    <h1 class="hero-title">
+      <span class="line1">Stop Scrolling.</span>
+      <span class="line2">Start Spinning.</span>
+      <span class="line3">Just Have Fun.</span>
+    </h1>
+    <p class="hero-sub">Three spinning wheels to solve every family dilemma — what to do, where to go, and what to eat tonight.</p>
+    <div class="hero-cards">
+      <a href="#" onclick="scrollTo('activities');return false;" class="hero-card act">
+        <span class="icon">🎮</span>
+        <span class="label">Screen-Free<br>Activities</span>
+      </a>
+      <a href="#" onclick="scrollTo('places');return false;" class="hero-card place">
+        <span class="icon">🦁</span>
+        <span class="label">Philly Kid<br>Adventures</span>
+      </a>
+      <a href="#" onclick="scrollTo('food');return false;" class="hero-card food">
+        <span class="icon">🥩</span>
+        <span class="label">Philly<br>Takeout</span>
+      </a>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll to spin</div>
+</section>
+
+<!-- ═══ SECTION 1: ACTIVITIES ═══ -->
+<section class="spinner-section" id="activities">
+  <div class="section-header">
+    <div class="section-tag">📵 No Screens Required</div>
+    <h2 class="section-title">What Should<br>We Do?</h2>
+    <p class="section-sub">87 screen-free activities for kids of all ages. Filter by category, duration, or location — then spin!</p>
+  </div>
+  <div class="spinner-layout">
+    <div class="spinner-left">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-ring"></div>
+        <canvas class="wheel" id="actCanvas"></canvas>
+        <div class="wheel-hub">🎮</div>
+      </div>
+      <button class="spin-btn" id="actSpinBtn" onclick="spin('act')">🎲 Spin It!</button>
+      <div class="no-match-msg" id="actNoMatch">No activities match — try different filters!</div>
+    </div>
+    <div class="spinner-right">
+      <div class="filters-card">
+        <div class="filters-title">Filter Activities</div>
+        <div class="filter-grid-3">
+          <div class="fg"><label>&#128194; Category</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('actCat')"><span class="ms-trigger-text placeholder" id="actCat-lbl">All</span><span class="ms-count" id="actCat-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="actCat-drop"></div></div></div>
+          <div class="fg"><label>&#9201; Duration</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('actDur')"><span class="ms-trigger-text placeholder" id="actDur-lbl">Any</span><span class="ms-count" id="actDur-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="actDur-drop"></div></div></div>
+          <div class="fg"><label>&#128205; Where</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('actLoc')"><span class="ms-trigger-text placeholder" id="actLoc-lbl">Any</span><span class="ms-count" id="actLoc-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="actLoc-drop"></div></div></div>
+        </div>
+        <div class="filter-footer">
+          <div class="match-pill"><strong id="actCount">87</strong> activities</div>
+          <button class="reset-btn" onclick="actReset()">&#8634; Reset</button>
+        </div>
+      </div>
+      <div class="result-card" id="actResult">
+        <div class="result-top">
+          <div>
+            <div class="result-lbl">Your Activity</div>
+            <div class="result-name" id="actRName"></div>
+          </div>
+          <div class="result-emoji-big" id="actREmoji"></div>
+        </div>
+        <div class="result-badges" id="actRBadges"></div>
+        <div class="result-body">
+          <div class="rf"><label>How to Play</label><p id="actRInstr"></p></div>
+          <div class="rf"><label>What You Need</label><p id="actRMat"></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 2: PLACES ═══ -->
+<section class="spinner-section" id="places">
+  <div class="section-header">
+    <div class="section-tag">📍 Greater Philadelphia Area</div>
+    <h2 class="section-title">Where Should<br>We Go?</h2>
+    <p class="section-sub">32 kid-friendly destinations in and around Philly. Filter by age, cost, setting, or drive time.</p>
+  </div>
+  <div class="spinner-layout">
+    <div class="spinner-left">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-ring"></div>
+        <canvas class="wheel" id="placeCanvas"></canvas>
+        <div class="wheel-hub">🦁</div>
+      </div>
+      <button class="spin-btn" id="placeSpinBtn" onclick="spin('place')">✨ Spin It!</button>
+      <div class="no-match-msg" id="placeNoMatch">No places match — try different filters!</div>
+    </div>
+    <div class="spinner-right">
+      <div class="filters-card">
+        <div class="filters-title">Filter Places</div>
+        <div class="filter-grid-2">
+          <div class="fg"><label>&#128194; Category</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plCat')"><span class="ms-trigger-text placeholder" id="plCat-lbl">All</span><span class="ms-count" id="plCat-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plCat-drop"></div></div></div>
+          <div class="fg"><label>&#127780; Setting</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plIndoor')"><span class="ms-trigger-text placeholder" id="plIndoor-lbl">Any</span><span class="ms-count" id="plIndoor-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plIndoor-drop"></div></div></div>
+          <div class="fg"><label>&#128176; Cost</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plFree')"><span class="ms-trigger-text placeholder" id="plFree-lbl">Any</span><span class="ms-count" id="plFree-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plFree-drop"></div></div></div>
+          <div class="fg"><label>&#128118; Age</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plAge')"><span class="ms-trigger-text placeholder" id="plAge-lbl">Any Age</span><span class="ms-count" id="plAge-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plAge-drop"></div></div></div>
+          <div class="fg"><label>&#128663; Drive Time</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plDrive')"><span class="ms-trigger-text placeholder" id="plDrive-lbl">Any</span><span class="ms-count" id="plDrive-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plDrive-drop"></div></div></div>
+          <div class="fg"><label>&#128205; Area</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('plArea')"><span class="ms-trigger-text placeholder" id="plArea-lbl">All Areas</span><span class="ms-count" id="plArea-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="plArea-drop"></div></div></div>
+        </div>
+        <div class="filter-footer">
+          <div class="match-pill"><strong id="placeCount">32</strong> places</div>
+          <button class="reset-btn" onclick="placeReset()">&#8634; Reset</button>
+        </div>
+      </div>
+      <div class="result-card" id="placeResult">
+        <div class="result-top">
+          <div>
+            <div class="result-lbl">Today's Adventure</div>
+            <div class="result-name" id="plRName"></div>
+          </div>
+          <div class="result-emoji-big" id="plREmoji"></div>
+        </div>
+        <div class="result-badges" id="plRBadges"></div>
+        <div class="result-body">
+          <div class="rf"><label>Area</label><p id="plRArea"></p></div>
+          <div class="rf"><label>Drive from Center City</label><p id="plRDrive"></p></div>
+          <div class="rf"><label>Best For</label><p id="plRAge"></p></div>
+          <div class="rf"><label>About</label><p id="plRDesc"></p></div>
+        </div>
+        <div class="result-actions" id="plActions"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 3: FOOD ═══ -->
+<section class="spinner-section" id="food">
+  <div class="section-header">
+    <div class="section-tag">🥩 Philadelphia Takeout & Delivery</div>
+    <h2 class="section-title">What Should<br>We Eat?</h2>
+    <p class="section-sub">106 Philly restaurants for takeout or delivery. Filter by neighborhood or cuisine — then let the wheel decide.</p>
+  </div>
+  <div class="spinner-layout">
+    <div class="spinner-left">
+      <div class="wheel-wrap">
+        <div class="wheel-pointer"></div>
+        <div class="wheel-ring"></div>
+        <canvas class="wheel" id="foodCanvas"></canvas>
+        <div class="wheel-hub">🥩</div>
+      </div>
+      <button class="spin-btn" id="foodSpinBtn" onclick="spin('food')">🎰 Spin It!</button>
+      <div class="no-match-msg" id="foodNoMatch">No restaurants match — try different filters!</div>
+    </div>
+    <div class="spinner-right">
+      <div class="filters-card">
+        <div class="filters-title">Filter Restaurants</div>
+        <div class="filter-grid-2">
+          <div class="fg"><label>&#128506; Neighborhood</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('foodNbr')"><span class="ms-trigger-text placeholder" id="foodNbr-lbl">All Neighborhoods</span><span class="ms-count" id="foodNbr-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="foodNbr-drop"></div></div></div>
+          <div class="fg"><label>&#127869; Cuisine</label><div class="ms-wrap"><button class="ms-trigger" onclick="msToggle('foodCui')"><span class="ms-trigger-text placeholder" id="foodCui-lbl">All Cuisines</span><span class="ms-count" id="foodCui-cnt" style="display:none"></span><span class="ms-arrow">&#9660;</span></button><div class="ms-dropdown" id="foodCui-drop"></div></div></div>
+        </div>
+        <div class="filter-footer">
+          <div class="match-pill"><strong id="foodCount">106</strong> restaurants</div>
+          <button class="reset-btn" onclick="foodReset()">&#8634; Reset</button>
+        </div>
+      </div>
+      <div class="result-card" id="foodResult">
+        <div class="result-top">
+          <div>
+            <div class="result-lbl">Tonight's Pick</div>
+            <div class="result-name" id="foodRName"></div>
+          </div>
+          <div class="result-emoji-big" id="foodREmoji"></div>
+        </div>
+        <div class="result-badges" id="foodRBadges"></div>
+        <div class="result-body">
+          <div class="rf"><label>Neighborhood</label><p id="foodRNbr"></p></div>
+          <div class="rf"><label>Cuisine</label><p id="foodRCui"></p></div>
+          <div class="rf"><label>About</label><p id="foodRDesc"></p></div>
+        </div>
+        <div class="result-actions" id="foodActions"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🎡 Philly Family HQ</div>
+  <div class="footer-sub">Made with ❤️ for Philly families</div>
+  <div class="footer-links">
+    <a href="#" onclick="scrollTo('activities');return false;" class="footer-link act">Activities</a>
+    <a href="#" onclick="scrollTo('places');return false;" class="footer-link place">Places</a>
+    <a href="#" onclick="scrollTo('food');return false;" class="footer-link food">Takeout</a>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════════
+function scrollTo(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+
+const ACTIVITIES = [{"title":"Build a Fort","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Blankets, pillows, chairs","instructions":"Use chairs and furniture as supports, then drape blankets to create a cozy fort big enough to sit or crawl inside"},{"title":"Pillow Mountain","category":"Movement","duration":5,"indoorOutdoor":"Indoor","materials":"Pillows, couch","instructions":"Stack pillows safely on the floor and jump from the couch onto them, one jump at a time"},{"title":"Play Charades","category":"Games","duration":15,"indoorOutdoor":"Either","materials":"None","instructions":"Take turns acting out animals, actions, or objects while others guess without speaking"},{"title":"Obstacle Course","category":"Movement","duration":15,"indoorOutdoor":"Either","materials":"Chairs, pillows, tape","instructions":"Create a course with crawling, hopping, balancing, and weaving challenges"},{"title":"Floor Is Lava","category":"Games","duration":5,"indoorOutdoor":"Indoor","materials":"Pillows","instructions":"Move from pillow to pillow without touching the floor"},{"title":"Freeze Dance","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"Music (optional)","instructions":"Dance freely, then freeze completely when the music stops"},{"title":"Balloon Volleyball","category":"Movement","duration":5,"indoorOutdoor":"Indoor","materials":"Balloon","instructions":"Hit the balloon back and forth without letting it touch the floor"},{"title":"Animal Walks","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Move like animals such as bears, frogs, crabs, or snakes"},{"title":"Hopscotch","category":"Games","duration":15,"indoorOutdoor":"Outdoor","materials":"Chalk","instructions":"Draw a hopscotch grid and hop through it following the rules"},{"title":"Red Light Green Light","category":"Games","duration":5,"indoorOutdoor":"Outdoor","materials":"None","instructions":"Run on \u201cgreen light\u201d and stop immediately on \u201cred light\u201d"},{"title":"Build a Lego Tower","category":"Building","duration":15,"indoorOutdoor":"Indoor","materials":"Legos or blocks","instructions":"Build the tallest tower you can without it falling over"},{"title":"Build a Castle","category":"Building","duration":30,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Design a castle with walls, towers, and an entrance"},{"title":"Build a City","category":"Building","duration":30,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Create buildings, roads, and neighborhoods for a city"},{"title":"Marble Run","category":"Building","duration":30,"indoorOutdoor":"Indoor","materials":"Blocks, tubes","instructions":"Build ramps and paths so marbles roll from top to bottom"},{"title":"Cardboard Box Rocket","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Box, markers","instructions":"Decorate a box as a rocket and pretend to blast off"},{"title":"Draw a Comic Strip","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Paper, markers","instructions":"Draw a short story using pictures and speech bubbles"},{"title":"Paper Airplanes","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Fold different paper airplanes and test how far they fly"},{"title":"Paper Plate Masks","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Plates, markers","instructions":"Decorate plates to look like animals or characters"},{"title":"Create a Flag","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Design a flag that represents your family or imagination"},{"title":"Shadow Puppets","category":"Imaginative Play","duration":15,"indoorOutdoor":"Indoor","materials":"Flashlight","instructions":"Use hands to make animal shapes on the wall"},{"title":"Puppet Show","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Socks","instructions":"Turn socks into puppets and perform a short show"},{"title":"Stuffed Animal Parade","category":"Imaginative Play","duration":5,"indoorOutdoor":"Indoor","materials":"Stuffed animals","instructions":"Line up toys and march them around the house"},{"title":"Indoor Camping","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Blankets","instructions":"Pretend camp by sitting in a blanket tent"},{"title":"Toy Car Ramp Race","category":"Games","duration":15,"indoorOutdoor":"Indoor","materials":"Cars, books","instructions":"Build ramps with books and race toy cars"},{"title":"Indoor Bowling","category":"Games","duration":15,"indoorOutdoor":"Indoor","materials":"Bottles, ball","instructions":"Knock over plastic bottles using a soft ball"},{"title":"Simon Says","category":"Games","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Follow instructions only when they start with \u201cSimon says\u201d"},{"title":"Follow the Leader","category":"Games","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Copy every movement the leader makes"},{"title":"Memory Game","category":"Learning","duration":15,"indoorOutdoor":"Indoor","materials":"Cards or objects","instructions":"Flip items over and try to find matching pairs"},{"title":"Alphabet Hunt","category":"Learning","duration":15,"indoorOutdoor":"Indoor","materials":"None","instructions":"Find objects around the house starting with each letter"},{"title":"Counting Jumps","category":"Learning","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Jump while counting out loud as high as you can"},{"title":"Guess the Sound","category":"Learning","duration":5,"indoorOutdoor":"Indoor","materials":"Household items","instructions":"Close eyes and guess sounds made by objects"},{"title":"Story Dice","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Dice or paper","instructions":"Roll dice or pick words to create a story"},{"title":"Story Acting","category":"Imaginative Play","duration":15,"indoorOutdoor":"Indoor","materials":"Book","instructions":"Act out a favorite story as it\u2019s read"},{"title":"Scavenger Hunt","category":"Exploration","duration":15,"indoorOutdoor":"Either","materials":"Item list","instructions":"Search for items based on clues or a checklist"},{"title":"Backyard Scavenger Hunt","category":"Exploration","duration":15,"indoorOutdoor":"Outdoor","materials":"Item list","instructions":"Find natural items like rocks, leaves, or sticks"},{"title":"Nature Walk Bingo","category":"Exploration","duration":30,"indoorOutdoor":"Outdoor","materials":"Bingo sheet","instructions":"Walk and mark off items you spot outside"},{"title":"Nature Art","category":"Creative","duration":15,"indoorOutdoor":"Outdoor","materials":"Leaves, sticks","instructions":"Arrange found items into pictures or patterns"},{"title":"Chalk Art","category":"Creative","duration":15,"indoorOutdoor":"Outdoor","materials":"Chalk","instructions":"Draw pictures or games on pavement"},{"title":"Build a Bug Hotel","category":"Exploration","duration":30,"indoorOutdoor":"Outdoor","materials":"Sticks, leaves","instructions":"Stack natural materials to create insect shelter"},{"title":"Water Toy Wash","category":"Pretend Play","duration":15,"indoorOutdoor":"Outdoor","materials":"Water, sponge","instructions":"Wash toy cars or figures outside"},{"title":"Dance Like an Animal","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Dance while pretending to be different animals"},{"title":"Silly Walk Contest","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Invent and show off funny walking styles"},{"title":"Stretch & Yoga","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Stretch arms, legs, and back slowly"},{"title":"Balance Challenge","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Balance on one foot or walk a straight line"},{"title":"Stack Cup Challenge","category":"Games","duration":5,"indoorOutdoor":"Indoor","materials":"Cups","instructions":"Stack and unstack cups as fast as possible"},{"title":"Paper Chain Challenge","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper, tape","instructions":"Make the longest paper chain you can"},{"title":"Draw With Other Hand","category":"Creative","duration":5,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Try drawing using your non\u2011dominant hand"},{"title":"Make a Maze","category":"Building","duration":30,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Build paths that toys must navigate"},{"title":"Treasure Map","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Draw a map and hide a small treasure"},{"title":"Guess the Animal","category":"Learning","duration":5,"indoorOutdoor":"Either","materials":"None","instructions":"Describe animals without naming them"},{"title":"Sorting Toys","category":"Learning","duration":5,"indoorOutdoor":"Indoor","materials":"Toys","instructions":"Sort toys by color, size, or type"},{"title":"Build a Bridge","category":"Building","duration":30,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Build a bridge that can hold weight"},{"title":"Toy Zoo","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Toys","instructions":"Create habitats for toy animals"},{"title":"Indoor Soccer","category":"Movement","duration":5,"indoorOutdoor":"Indoor","materials":"Soft ball","instructions":"Kick a soft ball between goals"},{"title":"Pillow Toss","category":"Games","duration":5,"indoorOutdoor":"Indoor","materials":"Pillow","instructions":"Toss pillows into a target"},{"title":"Hide and Seek","category":"Games","duration":15,"indoorOutdoor":"Either","materials":"None","instructions":"Hide while one person searches"},{"title":"Musical Statues","category":"Games","duration":5,"indoorOutdoor":"Either","materials":"Music","instructions":"Freeze when the music stops"},{"title":"Make Up a Song","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"None","instructions":"Create lyrics and sing a song"},{"title":"Draw a Self\u2011Portrait","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Draw a picture of yourself"},{"title":"Build With Recyclables","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Boxes, tubes","instructions":"Build inventions from recyclables"},{"title":"Shadow Tag","category":"Games","duration":5,"indoorOutdoor":"Outdoor","materials":"Sunlight","instructions":"Step on others\u2019 shadows"},{"title":"Toy Car City","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Cars","instructions":"Build roads and parking areas"},{"title":"Alphabet Yoga","category":"Learning","duration":15,"indoorOutdoor":"Either","materials":"None","instructions":"Make letter shapes with your body"},{"title":"Make a Crown","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Cut and decorate a crown"},{"title":"Guess the Object","category":"Learning","duration":5,"indoorOutdoor":"Indoor","materials":"Blindfold","instructions":"Guess objects by touch"},{"title":"Indoor Relay Race","category":"Movement","duration":5,"indoorOutdoor":"Indoor","materials":"None","instructions":"Race while completing simple tasks"},{"title":"Build a Tower Blindfolded","category":"Games","duration":5,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Build without looking"},{"title":"Pattern Copy Game","category":"Learning","duration":15,"indoorOutdoor":"Indoor","materials":"Blocks","instructions":"Copy block patterns exactly"},{"title":"Story Chain","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"None","instructions":"Take turns adding sentences to a story"},{"title":"Balloon Keep\u2011Up","category":"Movement","duration":5,"indoorOutdoor":"Either","materials":"Balloon","instructions":"Keep balloon in the air"},{"title":"Toy Parade","category":"Imaginative Play","duration":5,"indoorOutdoor":"Indoor","materials":"Toys","instructions":"March toys around while narrating"},{"title":"Make a Time Capsule","category":"Creative","duration":30,"indoorOutdoor":"Indoor","materials":"Box","instructions":"Collect items to open later"},{"title":"Build a Tent","category":"Imaginative Play","duration":30,"indoorOutdoor":"Indoor","materials":"Sheets","instructions":"Create a tent using furniture"},{"title":"Quiet Drawing Time","category":"Creative","duration":15,"indoorOutdoor":"Indoor","materials":"Paper","instructions":"Draw freely and quietly"},
+{"title":"Tape Maze on the Floor","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Painter's tape","instructions":"Use painter's tape to create a maze, balance beam, or hopscotch grid on the floor. Kids walk, jump, or hop through it — change the course to keep it fresh"},
+{"title":"Sock Slide Race","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Socks, hallway floor","instructions":"Put on socks and race down a smooth hallway. Add cones or stuffed animals as obstacles to weave around. Take turns timing each other"},
+{"title":"Cardboard Box Crash Course","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Cardboard boxes","instructions":"Stack boxes into towers and let kids knock them down by rolling a ball, throwing a beanbag, or running through them like a maze"},
+{"title":"Superhero Training Camp","category":"Movement","duration":30,"indoorOutdoor":"Either","materials":"Pillows, tape, stuffed animals","instructions":"Set up 5 superhero challenges: leap over lava (pillows), crawl through a tunnel (chairs + blanket), balance on one foot, spin 5 times, save a stuffed animal from the top shelf"},
+{"title":"Dance Party Freeze Game","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Music","instructions":"Put on a playlist and take turns being the DJ. Everyone dances until the DJ pauses the music — freeze instantly! Keep rounds going with sillier freeze poses each time"},
+{"title":"Indoor Mini Olympics","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Tape, balloon, pillow","instructions":"Run 5 events: balloon tap relay, pillow hurdles, crab walk race, long jump from the couch, and spin challenge. Award imaginary medals after each"},
+{"title":"Paper Plate Ice Skating","category":"Movement","duration":30,"indoorOutdoor":"Indoor","materials":"Paper plates, smooth floor","instructions":"Stand on two paper plates and glide across a smooth floor. Practice spins, figure eights, and pretend routines. Great on wood or tile floors with socks"},
+{"title":"Simon Says Full-Body Edition","category":"Movement","duration":30,"indoorOutdoor":"Either","materials":"None","instructions":"Play Simon Says but with bigger full-body moves: do 10 jumping jacks, bear crawl to the wall, balance like a flamingo, crab walk across the room. Take turns being Simon"},
+{"title":"Backyard Relay Race","category":"Movement","duration":30,"indoorOutdoor":"Outdoor","materials":"Cones or markers","instructions":"Set up a relay with 4 legs: sprint, skip, hop on one foot, and bear crawl. Race solo for best time or set up teams. Mix up the movements each round"},
+{"title":"Puddle Jump & Splash Walk","category":"Movement","duration":30,"indoorOutdoor":"Outdoor","materials":"Rain boots","instructions":"Put on boots and go find every puddle in the neighborhood. Jump in, measure depth, race to the next one. Make it a map — can you find 10 puddles?"},
+{"title":"Hula Hoop Games","category":"Movement","duration":30,"indoorOutdoor":"Either","materials":"Hula hoop","instructions":"Try 3 games: keep the hoop spinning as long as possible, roll it and chase it, and toss items (socks, beanbags) to land inside the hoop. Keep score and switch games every 5 minutes"},
+{"title":"Bubble Chase","category":"Movement","duration":30,"indoorOutdoor":"Outdoor","materials":"Bubble wand and solution","instructions":"Blow bubbles and challenge kids to pop every single one before they hit the ground. Make rules: only elbow pops, only foot pops. Keep going until the bubble solution runs out"}];
+
+const PLACES = [{"name":"Philadelphia Zoo","category":"Zoo","area":"West Philadelphia / Fairmount Park","address":"3400 W Girard Ave, Philadelphia, PA 19104","website":"https://www.philadelphiazoo.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Paid","driveTime":"10\u201315 min","description":"America\u2019s first zoo with Zoo360 trails and KidZooU hands\u2011on exhibits."},{"name":"The Franklin Institute","category":"Science Museum","area":"Center City (Museum District)","address":"222 N 20th St, Philadelphia, PA 19103","website":"https://www.fi.edu","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"0\u20135 min","description":"Interactive science museum with the walk\u2011through heart and live demos."},{"name":"Please Touch Museum","category":"Children\u2019s Museum","area":"West Philadelphia (Fairmount Park)","address":"4231 Avenue of the Republic, Philadelphia, PA 19131","website":"https://www.pleasetouchmuseum.org","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"10\u201315 min","description":"Designed for younger kids with imaginative, hands\u2011on play."},{"name":"Smith Memorial Playground & Playhouse","category":"Playground","area":"West Philadelphia / Fairmount Park","address":"3500 Reservoir Dr, Philadelphia, PA 19121","website":"https://smithplayground.org","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Mostly Outdoor","freeOrPaid":"Free","driveTime":"10\u201315 min","description":"Huge playground plus indoor playhouse with a giant wooden slide."},{"name":"Anna C. Verna Playground (FDR Park)","category":"Playground","area":"South Philadelphia (FDR Park)","address":"1500 Pattison Ave, Philadelphia, PA 19145","website":"https://www.fairplayphilly.org/impact/anna-c-verna-playground","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"10\u201315 min","description":"Inclusive, nature\u2011based playground with massive swings and climbers."},{"name":"Adventure Aquarium","category":"Aquarium","area":"Camden, NJ (Waterfront)","address":"1 Riverside Dr, Camden, NJ 08103","website":"https://www.adventureaquarium.com","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"15\u201320 min","description":"Sharks, penguins, and touch tanks just across the river."},{"name":"Academy of Natural Sciences","category":"Natural History Museum","area":"Center City (Parkway)","address":"1900 Benjamin Franklin Pkwy, Philadelphia, PA 19103","website":"https://www.ansp.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"5\u201310 min","description":"Dinosaur Hall, live animals, and kid\u2011friendly science exhibits."},{"name":"Independence Seaport Museum","category":"Museum","area":"Old City / Waterfront","address":"211 S Christopher Columbus Blvd, Philadelphia, PA 19106","website":"https://www.phillyseaport.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"5\u201310 min","description":"Maritime history with historic ships kids can explore."},{"name":"Franklin Square","category":"Park / Amusements","area":"Old City","address":"200 N 6th St, Philadelphia, PA 19106","website":"https://historicphiladelphia.org/franklin-square","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Mixed","driveTime":"5\u201310 min","description":"Playground, carousel, mini\u2011golf, and seasonal events."},{"name":"Franklin Square Playground","category":"Playground","area":"Old City","address":"200 N 6th St, Philadelphia, PA 19106","website":"https://historicphiladelphia.org/franklin-square","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"5\u201310 min","description":"Award\u2011winning playground popular with preschoolers."},{"name":"Spruce Street Harbor Park","category":"Waterfront Park","area":"Old City / Waterfront","address":"301 S Christopher Columbus Blvd, Philadelphia, PA 19106","website":"https://www.delawareriverwaterfront.com/places/spruce-street-harbor-park","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"5\u201310 min","description":"Hammocks, games, food stalls, and riverfront fun (seasonal)."},{"name":"Sister Cities Park","category":"Splash Park","area":"Center City (Logan Square)","address":"18th St & Benjamin Franklin Pkwy, Philadelphia, PA 19103","website":"https://centercityphila.org/parks/sister-cities-park","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"0\u20135 min","description":"Seasonal splash fountain and open play space."},{"name":"Morris Arboretum & Gardens","category":"Gardens / Nature","area":"Chestnut Hill","address":"100 E Northwestern Ave, Philadelphia, PA 19118","website":"https://www.morrisarboretum.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Paid","driveTime":"25\u201330 min","description":"Tree Adventure paths and gardens for family nature time."},{"name":"Schuylkill Center for Environmental Education","category":"Nature Center","area":"Roxborough","address":"8480 Hagy\u2019s Mill Rd, Philadelphia, PA 19128","website":"https://schuylkillcenter.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Mostly Free","driveTime":"25\u201330 min","description":"Trails and hands\u2011on nature programs for young kids."},{"name":"Bartram\u2019s Garden","category":"Gardens / Nature","area":"Southwest Philadelphia","address":"5400 Lindbergh Blvd, Philadelphia, PA 19143","website":"https://www.bartramsgarden.org","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"15\u201320 min","description":"Riverfront trails and garden exploration ideal for preschoolers."},{"name":"Elmwood Park Zoo","category":"Zoo","area":"Norristown, PA","address":"1661 Harding Blvd, Norristown, PA 19401","website":"https://www.elmwoodparkzoo.org","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Paid","driveTime":"40\u201345 min","description":"Smaller, walkable zoo with playgrounds and animal encounters."},{"name":"LEGOLAND Discovery Center","category":"Indoor Play","area":"Plymouth Meeting, PA","address":"500 W Germantown Pike, Plymouth Meeting, PA 19462","website":"https://www.legolanddiscoverycenter.com/philadelphia","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"35\u201340 min","description":"LEGO rides, build zones, and 4D movies."},{"name":"Sesame Place","category":"Theme Park","area":"Langhorne, PA","address":"100 Sesame Rd, Langhorne, PA 19047","website":"https://sesameplace.com","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Outdoor","freeOrPaid":"Paid","driveTime":"45\u201350 min","description":"First theme\u2011park rides and water attractions for little kids."},{"name":"The Rail Park","category":"Urban Park","area":"Callowhill / Chinatown North","address":"990 Callowhill St, Philadelphia, PA 19123","website":"https://therailpark.org","ageRange":"All Ages","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"5\u201310 min","description":"Elevated park good for stroller walks and short outings."},{"name":"Fairmount Park","category":"Large City Park","area":"Citywide","address":"Multiple entrances","website":"https://www.myphillypark.org","ageRange":"All Ages","indoorOutdoor":"Outdoor","freeOrPaid":"Free","driveTime":"5\u201315 min","description":"Trails, playgrounds, and open green space across the city."},{"name":"Reading Terminal Market","category":"Food Hall","area":"Center City","address":"1136 Arch St, Philadelphia, PA 19107","website":"https://readingterminalmarket.org","ageRange":"All Ages","indoorOutdoor":"Indoor","freeOrPaid":"Free Entry","driveTime":"0\u20135 min","description":"Lively food hall with many kid\u2011friendly options."},{"name":"Kids at Play","category":"Indoor Play Space","area":"Multiple Philly Locations","address":"Multiple locations","website":"https://kidsatplaypa.com","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"5\u201320 min","description":"Safe indoor climbing and play structures for younger kids."},{"name":"Sky Zone","category":"Trampoline Park","area":"Multiple Suburbs","address":"Multiple locations","website":"https://www.skyzone.com","ageRange":"Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"20\u201340 min","description":"High\u2011energy trampoline fun."},{"name":"Morris Animal Refuge","category":"Animal Education","area":"Washington Square West","address":"1242 Lombard St, Philadelphia, PA 19147","website":"https://morisanimalrefuge.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Donation / Paid","driveTime":"5\u201310 min","description":"Teaches kids about animal care and adoption."},{"name":"Diggerland USA","category":"Theme Park","area":"West Berlin, NJ","address":"100 Pinedge Dr, West Berlin, NJ 08091","website":"https://diggerlandusa.com","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Outdoor","freeOrPaid":"Paid","driveTime":"45\u201350 min","description":"Construction\u2011themed park where kids ride real diggers."},{"name":"Free Library of Philadelphia","category":"Library / Education","area":"Citywide (Main: Logan Square)","address":"1901 Vine St, Philadelphia, PA 19103","website":"https://libwww.freelibrary.org","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Free","driveTime":"0\u201315 min","description":"Storytimes, play spaces, and kids\u2019 programming across dozens of branches."},{"name":"United States Mint","category":"Museum / History","area":"Old City","address":"151 N Independence Mall E, Philadelphia, PA 19106","website":"https://www.usmint.gov/about/tours-and-locations/philadelphia","ageRange":"Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Free","driveTime":"5\u201310 min","description":"Free self\u2011guided tour where kids can watch coins being made."},{"name":"Fireman\u2019s Hall Museum","category":"Museum / History","area":"Old City","address":"147 N 2nd St, Philadelphia, PA 19106","website":"https://www.firemanshallmuseum.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Free (donations)","driveTime":"5\u201310 min","description":"Antique fire engines, hands\u2011on exhibits, and fire safety education."},{"name":"American Helicopter Museum","category":"Museum / STEM","area":"West Chester, PA","address":"1220 American Blvd, West Chester, PA 19380","website":"https://www.helicoptermuseum.org","ageRange":"Preschool \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"50\u201355 min","description":"Helicopters kids can climb into, simulators, and aviation STEM exhibits."},{"name":"Battleship New Jersey Museum","category":"Museum / History","area":"Camden, NJ","address":"62 Battleship Place, Camden, NJ 08103","website":"https://battleshipnewjersey.org","ageRange":"Big Kids","indoorOutdoor":"Indoor & Outdoor","freeOrPaid":"Paid","driveTime":"10\u201315 min","description":"Massive battleship with self\u2011guided tours, ladders, bunks, and interactive exhibits."},{"name":"Bucks County Children\u2019s Museum","category":"Children\u2019s Museum","area":"New Hope, PA","address":"500 Union Square Dr, New Hope, PA 18938","website":"https://buckskids.org","ageRange":"Toddler \u2013 Preschool","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"60\u201365 min","description":"Hands\u2011on play museum focused on pretend play and early STEM for ages ~1\u20137."},{"name":"Delaware Children\u2019s Museum","category":"Children\u2019s Museum","area":"Wilmington, DE","address":"550 Justison St, Wilmington, DE 19801","website":"https://www.delawarechildrensmuseum.org","ageRange":"Toddler \u2013 Big Kids","indoorOutdoor":"Indoor","freeOrPaid":"Paid","driveTime":"45\u201350 min","description":"Large interactive museum with climbing structures, water play, and STEM exhibits."}];
+
+const RESTAURANTS = [{"name":"Angelo\u2019s Pizzeria","neighborhood":"Bella Vista","cuisine":"Pizza / Italian","description":"Legendary pizza & cheesesteaks","website":"https://angelospizzeriasouthphiladelphia.com"},{"name":"Pizzeria Beddia","neighborhood":"Fishtown","cuisine":"Pizza","description":"Award\u2011winning pizza with online ordering","website":"https://www.pizzeriabeddia.com"},{"name":"Pizza Shackamaxon","neighborhood":"Fishtown","cuisine":"Pizza","description":"Detroit & Sicilian styles","website":"https://pizzashackamaxon.com"},{"name":"Square Pie","neighborhood":"Fishtown","cuisine":"Pizza","description":"Detroit\u2011style square pies","website":"https://squarepiephilly.com"},{"name":"Dough Head","neighborhood":"East Passyunk","cuisine":"Pizza","description":"Sourdough pies, great takeout","website":"https://doughheadpizza.com"},{"name":"Pizzata Pizzeria & Birreria","neighborhood":"East Passyunk","cuisine":"Pizza","description":"Roman\u2011style pizza & beer","website":"https://pizzatapizzeria.com"},{"name":"Mike\u2019s BBQ","neighborhood":"East Passyunk","cuisine":"BBQ","description":"Texas\u2011style smoked meats","website":"https://mikesbbqphilly.com"},{"name":"Del Rossi\u2019s Cheesesteaks","neighborhood":"Northern Liberties","cuisine":"Cheesesteaks","description":"Late\u2011night favorite","website":"https://delrossis.com"},{"name":"Joe\u2019s Steaks + Soda Shop","neighborhood":"Fishtown","cuisine":"Cheesesteaks","description":"Reliable classic cheesesteaks","website":"https://www.joessteaks.com"},{"name":"Dalessandro\u2019s","neighborhood":"Roxborough","cuisine":"Cheesesteaks","description":"Chopped\u2011style steaks","website":"https://dalessandros.com"},{"name":"Woodrow\u2019s","neighborhood":"South Street","cuisine":"Sandwiches","description":"Elevated cheesesteaks","website":"https://woodrowsandwich.com"},{"name":"Middle Child","neighborhood":"Washington Sq West","cuisine":"Sandwiches","description":"Creative deli sandwiches","website":"https://www.middlechildphilly.com"},{"name":"Poe\u2019s Sandwich Joint","neighborhood":"Fishtown","cuisine":"Sandwiches","description":"Inventive, hearty sandwiches","website":"https://poessandwichjoint.com"},{"name":"Liberty Kitchen","neighborhood":"Fishtown","cuisine":"American","description":"Comfort food & sandwiches","website":"https://libertykitchenphilly.com"},{"name":"Goldie","neighborhood":"Multiple","cuisine":"Falafel","description":"Fast, consistent falafel","website":"https://www.goldiefalafel.com"},{"name":"Federal Donuts & Chicken","neighborhood":"Multiple","cuisine":"Fried Chicken","description":"Fried chicken & sides","website":"https://www.federaldonuts.com"},{"name":"Sweet Lucy\u2019s","neighborhood":"Northeast Philly","cuisine":"BBQ","description":"Classic BBQ platters","website":"https://sweetlucys.com"},{"name":"Kalaya","neighborhood":"Fishtown","cuisine":"Thai","description":"Southern Thai favorites","website":"https://www.kalayaphilly.com"},{"name":"Xi\u2019an Famous Foods","neighborhood":"University City","cuisine":"Chinese","description":"Hand\u2011pulled noodles","website":"https://www.xianfoods.com"},{"name":"South Sichuan","neighborhood":"Point Breeze","cuisine":"Chinese","description":"Authentic Sichuan dishes","website":"https://southsichuanphilly.com"},{"name":"Han Dynasty","neighborhood":"Multiple","cuisine":"Sichuan","description":"Spicy classics","website":"https://www.handynasty.net"},{"name":"DanDan","neighborhood":"Rittenhouse","cuisine":"Chinese","description":"Modern Sichuan\u2011inspired","website":"https://www.dandanrestaurant.com"},{"name":"Nom Wah","neighborhood":"Chinatown","cuisine":"Dim Sum","description":"Classic dim sum","website":"https://nomwah.com"},{"name":"Terakawa Ramen","neighborhood":"Chinatown","cuisine":"Japanese","description":"Rich tonkotsu ramen","website":"https://terakawaramen.com"},{"name":"Royal Izakaya (Izakaya side)","neighborhood":"Queen Village","cuisine":"Japanese","description":"Casual izakaya menu","website":"https://www.royalizakaya.com"},{"name":"Sidecar Bar & Grille","neighborhood":"Graduate Hospital","cuisine":"American","description":"Burgers & comfort food","website":"https://sidecarphilly.com"},{"name":"Griddle & Rice","neighborhood":"Point Breeze","cuisine":"Korean","description":"Korean comfort plates","website":"https://griddleandrice.com"},{"name":"Hardena","neighborhood":"Newbold","cuisine":"Indonesian","description":"Beloved counter\u2011service","website":"https://www.hardenaphilly.com"},{"name":"Rangoon","neighborhood":"Chinatown","cuisine":"Burmese","description":"Burmese comfort food","website":"https://rangoonphilly.com"},{"name":"Pho 75","neighborhood":"Washington Avenue","cuisine":"Vietnamese","description":"Classic pho","website":"https://pho75philly.com"},{"name":"Ba Le Bakery","neighborhood":"Washington Avenue","cuisine":"Vietnamese","description":"Excellent banh mi","website":"https://www.balebakeryphilly.com"},{"name":"El Purepecha","neighborhood":"Spring Garden","cuisine":"Mexican","description":"Michoac\u00e1n comfort food","website":"https://elpurepecha.com"},{"name":"South Philly Barbacoa","neighborhood":"Bella Vista","cuisine":"Mexican","description":"Lamb barbacoa tacos","website":"https://www.southphillybarbacoa.com"},{"name":"Little Nonna\u2019s","neighborhood":"Midtown Village","cuisine":"Italian","description":"Comfort Italian classics","website":"https://littlenonnas.com"},{"name":"Murph\u2019s Bar","neighborhood":"Fishtown","cuisine":"Italian","description":"Hidden Italian menu","website":"https://murphsbar.com"},{"name":"Cafe La Maude","neighborhood":"Northern Liberties","cuisine":"Brunch","description":"Lebanese\u2011French brunch","website":"https://cafelamaude.com"},{"name":"Sabrina\u2019s Caf\u00e9","neighborhood":"Multiple","cuisine":"Brunch","description":"Comfort breakfast & lunch","website":"https://sabrinascafe.com"},{"name":"Dock Street","neighborhood":"Multiple","cuisine":"Pizza","description":"Farm\u2011focused pies","website":"https://dockstreetbeer.com"},{"name":"Honeysuckle Provisions","neighborhood":"Spring Garden","cuisine":"Southern","description":"Seasonal Southern food","website":"https://honeysuckleprovisions.com"},{"name":"K\u2019Far","neighborhood":"Rittenhouse","cuisine":"Israeli Bakery","description":"Pastries & sandwiches","website":"https://kfarcafe.com"},{"name":"Suraya","neighborhood":"Fishtown","cuisine":"Lebanese","description":"Mezze & flatbreads","website":"https://www.surayaphilly.com"},{"name":"Laser Wolf","neighborhood":"Kensington","cuisine":"Israeli","description":"Skewers & salatim","website":"https://www.laserwolfphilly.com"},{"name":"Cleavers","neighborhood":"Center City","cuisine":"Cheesesteaks","description":"Craft cheesesteaks","website":"https://cleaversphilly.com"},{"name":"Marathon Grill","neighborhood":"Multiple","cuisine":"American","description":"Reliable comfort food","website":"https://marathongrill.com"},{"name":"Famous 4th Street Deli","neighborhood":"Queen Village","cuisine":"Jewish Deli","description":"Classic deli takeout","website":"https://4thstreetdelicatessen.com"},{"name":"Hershel\u2019s East Side Deli","neighborhood":"Market East","cuisine":"Jewish Deli","description":"Pastrami & sandwiches","website":"https://hershels.com"},{"name":"Lucky\u2019s Last Chance","neighborhood":"Queen Village","cuisine":"Burgers","description":"Burgers & fries","website":"https://luckyslastchance.com"},{"name":"Joe\u2019s Pizza","neighborhood":"Center City","cuisine":"Pizza","description":"NY\u2011style slices","website":"https://joespizzanyc.com"},{"name":"Nom Nom Ramen","neighborhood":"Center City","cuisine":"Japanese","description":"Casual ramen bowls","website":"https://nomnomramen.com"},{"name":"Rex at the Royal","neighborhood":"South Street","cuisine":"Southern","description":"Southern comfort food","website":"https://rexattheroyal.com"},{"name":"Spot Gourmet Burgers","neighborhood":"Brewerytown","cuisine":"Burgers","description":"Burgers & wings","website":"https://spotburgers.com"},{"name":"Cedar Point Bar & Kitchen","neighborhood":"Fishtown","cuisine":"American","description":"Wings & comfort food","website":"https://cedarpointbar.com"},{"name":"Pho Saigon","neighborhood":"Washington Sq West","cuisine":"Vietnamese","description":"Reliable pho & vermicelli","website":"https://phosaigonphilly.com"},{"name":"Los Gallos","neighborhood":"South Philly","cuisine":"Mexican","description":"Tacos & platters","website":"https://losgallosphilly.com"},{"name":"Taco Heart","neighborhood":"East Passyunk","cuisine":"Mexican","description":"Playful tacos & sides","website":"https://tacoheart.com"},{"name":"L\u2019Angolo Ristorante","neighborhood":"South Philly","cuisine":"Italian","description":"Old\u2011school Italian takeout","website":"https://langolophilly.com"},{"name":"Dim Sum Garden","neighborhood":"Chinatown","cuisine":"Dim Sum","description":"Soup dumplings & dim sum","website":"https://dimsumgardenphilly.com"},{"name":"Little Sicily Pizza 2","neighborhood":"Pennsport","cuisine":"Pizza","description":"Laid-back pizza & Indian-style chicken cheesesteaks","website":"https://www.littlesicily2.com/"},{"name":"Koch\u2019s Deli","neighborhood":"University City","cuisine":"Jewish Deli","description":"Classic hoagies & deli","website":"https://kochsdeliphilly.com"},{"name":"Dolores\u2019 Deli","neighborhood":"Pennsport","cuisine":"Hoagies","description":"Creative hoagies & specialty sandwiches","website":""},{"name":"Gilda","neighborhood":"Fishtown","cuisine":"Italian","description":"Pasta & comfort plates","website":"https://gildafishtown.com"},{"name":"Picnic","neighborhood":"Fishtown","cuisine":"American","description":"Sandwiches & salads","website":"https://picnicphilly.com"},{"name":"Rosario\u2019s Pizza","neighborhood":"Point Breeze","cuisine":"Pizza","description":"Mexican style pizza","website":"https://rosariospizza.com"},{"name":"Pho Xe Lua Viet Thai","neighborhood":"Chinatown","cuisine":"Vietnamese","description":"Pho & Thai staples","website":"https://phoxelua.com"},{"name":"Dam\u00f3 Pasta Lab","neighborhood":"Center City","cuisine":"Italian","description":"Fresh pasta takeout","website":"https://damopastalab.com"},{"name":"The Dutch","neighborhood":"East Passyunk","cuisine":"Southern","description":"Southern comfort classics","website":"https://thedutchphilly.com"},{"name":"Nick\u2019s Roast Beef","neighborhood":"South Philly","cuisine":"Roast Beef","description":"Old\u2011school roast beef","website":"https://nicksroastbeef.com"},{"name":"Czerw\u2019s Kielbasa","neighborhood":"Port Richmond","cuisine":"Polish","description":"Kielbasa & pierogi","website":"https://czerws.com"},{"name":"Little Fish","neighborhood":"Queen Village","cuisine":"Seafood","description":"Seafood plates & sides","website":"https://littlefishphilly.com"},{"name":"El Ching\u00f3n","neighborhood":"East Passyunk","cuisine":"Mexican","description":"Mexico City\u2011style tacos","website":"https://elchingonphilly.com"},{"name":"Doro Bet","neighborhood":"West Philly","cuisine":"Ethiopian","description":"Ethiopian fried chicken","website":"https://dorobet.com"},{"name":"Abyssinia","neighborhood":"West Philly","cuisine":"Ethiopian","description":"Ethiopian stews & platters","website":"https://abyssiniaphilly.com"},{"name":"Amma\u2019s South Indian","neighborhood":"Center City","cuisine":"South Indian","description":"Vegetarian dosas & curries","website":"https://ammasrestaurantphilly.com"},{"name":"Masala Kitchen","neighborhood":"Center City","cuisine":"Indian","description":"Indian street food","website":"https://masalakitchen.com"},{"name":"North Third","neighborhood":"Northern Liberties","cuisine":"American","description":"Pub comfort food","website":"https://norththirdrestaurant.com"},{"name":"Love & Honey Fried Chicken","neighborhood":"Fishtown","cuisine":"Fried Chicken","description":"Korean\u2011inspired fried chicken","website":"https://loveandhoneyfriedchicken.com"},{"name":"Kyuramen","neighborhood":"Chinatown","cuisine":"Japanese","description":"Ramen & rice bowls","website":"https://kyuramen.com"},{"name":"Gojjo","neighborhood":"West Philly","cuisine":"Ethiopian","description":"Ethiopian classics","website":"https://gojjophilly.com"},{"name":"Manakeesh Cafe Bakery","neighborhood":"West Philly","cuisine":"Middle Eastern","description":"Flatbreads & wraps","website":"https://manakeeshphilly.com"},{"name":"Honey\u2019s Sit \u2019n Eat","neighborhood":"Northern Liberties","cuisine":"Brunch","description":"Jewish\u2011style comfort food","website":"https://honeysitneat.com"},{"name":"Zesto Pizza & Grill","neighborhood":"University City","cuisine":"Pizza","description":"Greek\u2011style pizza & platters","website":"https://zestopizzagrill.com"},{"name":"Pera Turkish Cuisine","neighborhood":"Northern Liberties","cuisine":"Turkish","description":"Kebabs & mezze","website":"https://peraphilly.com"},{"name":"Thanal Indian Tavern","neighborhood":"Center City","cuisine":"Indian","description":"Indian comfort food","website":"https://thanalphilly.com"},{"name":"Mom Mom\u2019s Kitchen","neighborhood":"Port Richmond","cuisine":"Polish","description":"Polish Food","website":"https://www.mommomnomnom.com/"},{"name":"Dutch Eating Place","neighborhood":"Market East","cuisine":"Pennsylvania Dutch","description":"Comfort classics & breakfast","website":"https://dutcheatingplace.com"},{"name":"Ricci\u2019s Hoagies","neighborhood":"Bella Vista","cuisine":"Hoagies","description":"Old\u2011school Italian hoagies","website":"https://www.originalriccishoagies.com"},{"name":"Cosmi\u2019s Deli","neighborhood":"East Passyunk","cuisine":"Hoagies","description":"Classic South Philly Italian hoagies","website":"https://cosmisdeli.com"},{"name":"Farina Di Vita","neighborhood":"Queen Village","cuisine":"Hoagies","description":"High\u2011quality hoagies & cutlet sandwiches","website":"https://farinadivita.com"},{"name":"Castellino\u2019s Italian Market","neighborhood":"Fishtown","cuisine":"Hoagies","description":"Creative hoagies & specialty sandwiches","website":"https://castellinositalianmarket.com"},{"name":"Antonio\u2019s Deli","neighborhood":"South Philly","cuisine":"Hoagies","description":"Famous veggie & cutlet hoagies","website":"https://antoniosdeli.com"},{"name":"JJ Thai Cuisine","neighborhood":"Rittenhouse","cuisine":"Thai","description":"Consistently excellent Thai classics","website":"http://www.jjthaicuisine.com"},{"name":"Erawan Thai Cuisine","neighborhood":"Rittenhouse","cuisine":"Thai","description":"Comforting Thai curries & noodles","website":"https://erawanphilly.com"},{"name":"Chatayee Thai","neighborhood":"Midtown Village","cuisine":"Thai","description":"Traditional Thai with strong vegetarian options","website":"https://chatayeethai.com"},{"name":"Circles Thai","neighborhood":"Northern Liberties","cuisine":"Thai","description":"Reliable neighborhood Thai takeout","website":"https://circlesphilly.com"},{"name":"Grandma\u2019s Philly","neighborhood":"Midtown Village","cuisine":"Thai","description":"Bold flavors, modern Thai comfort food","website":"https://grandmasphilly.com"},{"name":"Ekta Indian Cuisine","neighborhood":"Multiple","cuisine":"Indian","description":"Broad North Indian menu, fast service","website":"https://ektarestaurant.com"},{"name":"Virasat Haveli","neighborhood":"West Philly","cuisine":"Indian","description":"Punjabi classics, generous portions","website":"https://virasathaveli.com"},{"name":"New Delhi Indian Restaurant","neighborhood":"University City","cuisine":"Indian","description":"Long\u2011running, reliable Indian takeout","website":"http://www.newdelhiweb.com"},{"name":"EMei","neighborhood":"Chinatown","cuisine":"Sichuan","description":"Spicy Sichuan favorites","website":"https://www.emeiphilly.com"},{"name":"Nan Zhou Hand Drawn Noodle House","neighborhood":"Chinatown","cuisine":"Chinese","description":"Hand\u2011pulled noodles & soups","website":"https://nanzhounoodles.com"},{"name":"Sang Kee Peking Duck House","neighborhood":"Chinatown","cuisine":"Chinese","description":"Duck, BBQ meats & classic dishes","website":"https://sangkee.com"},{"name":"Dim Sum House by Jane G\u2019s","neighborhood":"University City","cuisine":"Chinese","description":"Dim sum & wok dishes","website":"http://www.dimsum.house"},{"name":"Spice C","neighborhood":"Chinatown","cuisine":"Chinese","description":"Casual Sichuan noodles & small plates","website":"https://spicecphilly.com"},{"name":"Small Oven Pastry Shop & Porco's Porchetteria","neighborhood":"Graduate Hospital","cuisine":"Sandwiches","description":"Porchetta sandwiches and small treats","website":"https://www.smallovenpastryshop.com/"},{"name":"Breezy's Deli and Market","neighborhood":"Graduate Hospital","cuisine":"Hoagies","description":"Great newish hoagie spot","website":"https://www.breezysdeli.com/"}];
+
+// ═══════════════════════════════════════════════════════════════════
+// EMOJI MAPS
+// ═══════════════════════════════════════════════════════════════════
+const ACT_EMOJI = {"Building":"🏗️","Creative":"🎨","Exploration":"🔍","Games":"🎮","Imaginative Play":"🧸","Learning":"📚","Movement":"🏃","Pretend Play":"🎭"};
+const PLACE_EMOJI = {"Zoo":"🦁","Aquarium":"🦈","Children's Museum":"🧸","Science Museum":"🚀","Natural History Museum":"🦕","Museum":"⛵","Museum / History":"🏛️","Museum / STEM":"🚁","Nature Center":"🌿","Gardens / Nature":"🌸","Playground":"🛝","Splash Park":"💦","Waterfront Park":"🌊","Urban Park":"🌳","Large City Park":"🌳","Park / Amusements":"🎡","Theme Park":"🎢","Indoor Play":"🧱","Indoor Play Space":"🧗","Trampoline Park":"🤸","Animal Education":"🐾","Library / Education":"📚","Food Hall":"🥨"};
+const FOOD_EMOJI = {"Pizza":"🍕","Pizza / Italian":"🍕","Italian":"🍝","Cheesesteaks":"🥩","Sandwiches":"🥪","Hoagies":"🥖","BBQ":"🍖","American":"🍔","Burgers":"🍔","Fried Chicken":"🍗","Falafel":"🧆","Thai":"🌶️","Chinese":"🥟","Sichuan":"🌶️","Dim Sum":"🥟","Japanese":"🍜","Korean":"🍱","Indonesian":"🥘","Burmese":"🍲","Vietnamese":"🍜","Mexican":"🌮","Lebanese":"🫓","Israeli":"🔥","Israeli Bakery":"🥐","Southern":"🫕","Jewish Deli":"🥪","Brunch":"🥞","Seafood":"🦞","Ethiopian":"🍲","Indian":"🍛","South Indian":"🍛","Middle Eastern":"🫓","Polish":"🥟","Turkish":"🌯","Roast Beef":"🥩","Pennsylvania Dutch":"🥘"};
+
+// Wheel color sets per section
+const ACT_COLORS  = ["#1a5c3a","#256b45","#1f7a4a","#2a8a55","#166040","#1c6e45","#237050","#187842","#2b9060","#1e6840"];
+const PLACE_COLORS = ["#1a1a6e","#2a2a8e","#1e3a8a","#2d4fa0","#162266","#243d9e","#1a2d7a","#203288","#162870","#2a3a96"];
+const FOOD_COLORS  = ["#7c2a00","#923200","#a83800","#8b2f00","#6e2500","#9d3600","#b44000","#803000","#952e00","#7a2800"];
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+const state = {
+  act:   { filtered: [...ACTIVITIES], angle: 0, spinning: false },
+  place: { filtered: [...PLACES],     angle: 0, spinning: false },
+  food:  { filtered: [...RESTAURANTS],angle: 0, spinning: false }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// MULTI-SELECT ENGINE
+// ═══════════════════════════════════════════════════════════════════
+const msState = {}; // { filterId: Set of selected values }
+
+function msInit(id, options, placeholder) {
+  msState[id] = new Set();
+  const drop = document.getElementById(id + '-drop');
+  drop.innerHTML = '';
+  options.forEach(({val, label}) => {
+    const div = document.createElement('div');
+    div.className = 'ms-option';
+    div.dataset.val = val;
+    div.innerHTML = '<span class="ms-checkbox"></span>' + label;
+    div.onclick = () => msPick(id, val);
+    drop.appendChild(div);
+  });
+}
+
+function msToggle(id) {
+  const drop = document.getElementById(id + '-drop');
+  const btn  = drop.previousElementSibling;
+  const isOpen = drop.classList.contains('open');
+  // close all others
+  document.querySelectorAll('.ms-dropdown.open').forEach(d => {
+    d.classList.remove('open');
+    d.previousElementSibling.classList.remove('open');
+  });
+  if (!isOpen) { drop.classList.add('open'); btn.classList.add('open'); }
+}
+
+function msPick(id, val) {
+  if (!msState[id]) msState[id] = new Set();
+  if (msState[id].has(val)) msState[id].delete(val);
+  else msState[id].add(val);
+  msRefreshUI(id);
+  // trigger the right filter
+  if (id.startsWith('act'))   actFilter();
+  if (id.startsWith('pl'))    placeFilter();
+  if (id.startsWith('food'))  foodFilter();
+}
+
+function msGet(id) { return msState[id] ? [...msState[id]] : []; }
+function msHas(id)  { return msState[id] && msState[id].size > 0; }
+
+function msRefreshUI(id) {
+  const sel = msState[id] || new Set();
+  const drop = document.getElementById(id + '-drop');
+  const lbl  = document.getElementById(id + '-lbl');
+  const cnt  = document.getElementById(id + '-cnt');
+  // update checkboxes
+  drop.querySelectorAll('.ms-option').forEach(opt => {
+    const checked = sel.has(opt.dataset.val);
+    opt.classList.toggle('selected', checked);
+    opt.querySelector('.ms-checkbox').textContent = checked ? '✓' : '';
+  });
+  // update trigger label
+  if (sel.size === 0) {
+    lbl.textContent = lbl.closest('.ms-trigger').dataset.placeholder || 'All';
+    lbl.classList.add('placeholder');
+    cnt.style.display = 'none';
+  } else if (sel.size === 1) {
+    lbl.textContent = [...sel][0];
+    lbl.classList.remove('placeholder');
+    cnt.style.display = 'none';
+  } else {
+    lbl.textContent = [...sel][0];
+    lbl.classList.remove('placeholder');
+    cnt.textContent = '+' + (sel.size - 1);
+    cnt.style.display = '';
+  }
+}
+
+function msClear(id) {
+  msState[id] = new Set();
+  msRefreshUI(id);
+}
+
+// close dropdowns when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ms-wrap')) {
+    document.querySelectorAll('.ms-dropdown.open').forEach(d => {
+      d.classList.remove('open');
+      d.previousElementSibling.classList.remove('open');
+    });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// FILTER SETUP
+// ═══════════════════════════════════════════════════════════════════
+function buildAllFilters() {
+  // Activities
+  msInit('actCat', ['Building','Creative','Exploration','Games','Imaginative Play','Learning','Movement','Pretend Play'].map(v=>({val:v,label:v})), 'All');
+  msInit('actDur', [{val:'5',label:'5 min'},{val:'15',label:'15 min'},{val:'30',label:'30 min'}], 'Any');
+  msInit('actLoc', ['Indoor','Outdoor','Either'].map(v=>({val:v,label:v})), 'Any');
+  // set placeholder text on triggers
+  document.getElementById('actCat-lbl').closest('.ms-trigger').dataset.placeholder = 'All';
+  document.getElementById('actDur-lbl').closest('.ms-trigger').dataset.placeholder = 'Any';
+  document.getElementById('actLoc-lbl').closest('.ms-trigger').dataset.placeholder = 'Any';
+
+  // Places
+  const plCats  = [...new Set(PLACES.map(p=>p.category))].sort();
+  const plAreas = [...new Set(PLACES.map(p=>p.area))].sort();
+  msInit('plCat',    plCats.map(v=>({val:v,label:v})),   'All');
+  msInit('plIndoor', ['Indoor','Outdoor','Mostly Outdoor','Indoor & Outdoor'].map(v=>({val:v,label:v})), 'Any');
+  msInit('plFree',   [{val:'free',label:'Free / Donation'},{val:'paid',label:'Paid'}], 'Any');
+  msInit('plAge',    ['Toddler \u2013 Preschool','Toddler \u2013 Big Kids','Preschool \u2013 Big Kids','Big Kids'].map(v=>({val:v,label:v})), 'Any Age');
+  msInit('plDrive',  [{val:'close',label:'Under 15 min'},{val:'medium',label:'15\u201330 min'},{val:'far',label:'30+ min'}], 'Any');
+  msInit('plArea',   plAreas.map(v=>({val:v,label:v})),  'All Areas');
+  ['plCat','plIndoor','plFree','plAge','plDrive','plArea'].forEach(id => {
+    const lbl = document.getElementById(id + '-lbl');
+    lbl.closest('.ms-trigger').dataset.placeholder = lbl.textContent;
+  });
+
+  // Food
+  const nbrs = [...new Set(RESTAURANTS.map(r=>r.neighborhood))].sort();
+  const cuis = [...new Set(RESTAURANTS.map(r=>r.cuisine.trim()))].sort();
+  msInit('foodNbr', nbrs.map(v=>({val:v,label:v})), 'All Neighborhoods');
+  msInit('foodCui', cuis.map(v=>({val:v,label:v})), 'All Cuisines');
+  ['foodNbr','foodCui'].forEach(id => {
+    const lbl = document.getElementById(id + '-lbl');
+    lbl.closest('.ms-trigger').dataset.placeholder = lbl.textContent;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FILTER LOGIC
+// ═══════════════════════════════════════════════════════════════════
+function actFilter() {
+  const cats = msGet('actCat');
+  const durs = msGet('actDur');
+  const locs = msGet('actLoc');
+  state.act.filtered = ACTIVITIES.filter(a => {
+    if (cats.length && !cats.includes(a.category)) return false;
+    if (durs.length && !durs.includes(String(a.duration))) return false;
+    if (locs.length) {
+      // "Either" items match Indoor or Outdoor selections
+      const match = locs.includes(a.indoorOutdoor) || a.indoorOutdoor === 'Either';
+      if (!match) return false;
+    }
+    return true;
+  });
+  updateCount('actCount', state.act.filtered.length);
+  updateNoMatch('actNoMatch','actSpinBtn', state.act.filtered.length);
+  drawWheel('act');
+}
+function actReset() {
+  ['actCat','actDur','actLoc'].forEach(id => msClear(id));
+  actFilter();
+}
+
+function placeFilter() {
+  const cats  = msGet('plCat');
+  const indos = msGet('plIndoor');
+  const frees = msGet('plFree');
+  const ages  = msGet('plAge');
+  const drives= msGet('plDrive');
+  const areas = msGet('plArea');
+  state.place.filtered = PLACES.filter(p => {
+    if (cats.length  && !cats.includes(p.category)) return false;
+    if (indos.length && !indos.includes(p.indoorOutdoor)) return false;
+    if (frees.length) {
+      const lc = p.freeOrPaid.toLowerCase();
+      const isFree = lc.includes('free') || lc.includes('donation');
+      const bucket = isFree ? 'free' : 'paid';
+      if (!frees.includes(bucket)) return false;
+    }
+    if (ages.length && p.ageRange !== 'All Ages') {
+      if (!ages.includes(p.ageRange)) return false;
+    }
+    if (drives.length) {
+      const nums = p.driveTime.match(/\d+/g)||[];
+      const max = Math.max(...nums.map(Number));
+      const bucket = max<=15 ? 'close' : max<=30 ? 'medium' : 'far';
+      if (!drives.includes(bucket)) return false;
+    }
+    if (areas.length && !areas.includes(p.area)) return false;
+    return true;
+  });
+  updateCount('placeCount', state.place.filtered.length);
+  updateNoMatch('placeNoMatch','placeSpinBtn', state.place.filtered.length);
+  drawWheel('place');
+}
+function placeReset() {
+  ['plCat','plIndoor','plFree','plAge','plDrive','plArea'].forEach(id => msClear(id));
+  placeFilter();
+}
+
+function foodFilter() {
+  const nbrs = msGet('foodNbr');
+  const cuis = msGet('foodCui');
+  state.food.filtered = RESTAURANTS.filter(r => {
+    if (nbrs.length && !nbrs.includes(r.neighborhood)) return false;
+    if (cuis.length && !cuis.includes(r.cuisine.trim())) return false;
+    return true;
+  });
+  updateCount('foodCount', state.food.filtered.length);
+  updateNoMatch('foodNoMatch','foodSpinBtn', state.food.filtered.length);
+  drawWheel('food');
+}
+function foodReset() {
+  ['foodNbr','foodCui'].forEach(id => msClear(id));
+  foodFilter();
+}
+
+
+function updateCount(id, n) { document.getElementById(id).textContent = n; }
+function updateNoMatch(nmId, btnId, n) {
+  document.getElementById(nmId).style.display = n===0 ? 'block' : 'none';
+  document.getElementById(btnId).disabled = n===0;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// WHEEL DRAWING
+// ═══════════════════════════════════════════════════════════════════
+const CANVAS_IDS = { act:'actCanvas', place:'placeCanvas', food:'foodCanvas' };
+const COLORS = { act:ACT_COLORS, place:PLACE_COLORS, food:FOOD_COLORS };
+const NAME_FN = { act: a=>a.title, place: p=>p.name, food: r=>r.name };
+
+function drawWheel(key, highlightIdx=-1) {
+  const canvas = document.getElementById(CANVAS_IDS[key]);
+  const size = canvas.parentElement.clientWidth;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx=size/2, cy=size/2, r=size/2-2;
+  const items = state[key].filtered.length ? state[key].filtered : [{title:'No results',name:'No results'}];
+  const slice = (2*Math.PI)/items.length;
+  const colors = COLORS[key];
+  const nameFn = NAME_FN[key];
+
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(state[key].angle);
+
+  items.forEach((item,i) => {
+    const start=i*slice, end=start+slice;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,start,end); ctx.closePath();
+    ctx.fillStyle = i===highlightIdx ? 'rgba(255,255,255,0.25)' : colors[i%colors.length];
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=1.2; ctx.stroke();
+
+    if (i===highlightIdx) {
+      ctx.beginPath(); ctx.arc(0,0,r-3,start,end);
+      ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=3; ctx.stroke();
+    }
+
+    const mid=start+slice/2;
+    ctx.save();
+    ctx.translate(Math.cos(mid)*r*0.6, Math.sin(mid)*r*0.6);
+    ctx.rotate(mid+Math.PI/2);
+    ctx.fillStyle = i===highlightIdx ? 'white' : 'rgba(255,255,255,0.9)';
+    const fs=Math.max(8,Math.min(13,280/items.length));
+    ctx.font=`800 ${fs}px 'Nunito',sans-serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,0.7)'; ctx.shadowBlur=3;
+
+    const name=nameFn(item)||'';
+    const words=name.split(' ');
+    let lines=[],line='';
+    words.forEach(w=>{
+      const t=line?line+' '+w:w;
+      if(ctx.measureText(t).width>r*0.48&&line){lines.push(line);line=w;}else line=t;
+    });
+    if(line)lines.push(line);
+    lines=lines.slice(0,3);
+    const lh=fs+2;
+    lines.forEach((l,li)=>ctx.fillText(l,0,(li-(lines.length-1)/2)*lh));
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function drawAll() {
+  drawWheel('act'); drawWheel('place'); drawWheel('food');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SPIN ENGINE (shared)
+// ═══════════════════════════════════════════════════════════════════
+function spin(key) {
+  const s = state[key];
+  if (s.spinning || !s.filtered.length) return;
+  s.spinning = true;
+  const btnId = {act:'actSpinBtn',place:'placeSpinBtn',food:'foodSpinBtn'}[key];
+  document.getElementById(btnId).disabled = true;
+  document.getElementById({act:'actResult',place:'placeResult',food:'foodResult'}[key]).classList.remove('show');
+
+  const winnerIdx = Math.floor(Math.random()*s.filtered.length);
+  const slice = (2*Math.PI)/s.filtered.length;
+  const targetAngle = -Math.PI/2-(winnerIdx+0.5)*slice;
+  const curNorm = ((s.angle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  const tgtNorm = ((targetAngle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+  let delta = tgtNorm-curNorm;
+  if (delta<=0) delta+=2*Math.PI;
+  const finalAngle = s.angle+delta+(6+Math.floor(Math.random()*5))*2*Math.PI;
+  const startAngle=s.angle, startTime=performance.now(), duration=4000;
+  const easeOut=t=>1-Math.pow(1-t,4);
+
+  function animate(now) {
+    const t=Math.min((now-startTime)/duration,1);
+    s.angle=startAngle+(finalAngle-startAngle)*easeOut(t);
+    drawWheel(key);
+    if(t<1){requestAnimationFrame(animate);return;}
+    s.angle=((finalAngle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+    const localPtr=((-Math.PI/2)-s.angle+4*Math.PI)%(2*Math.PI);
+    const landedIdx=Math.floor(localPtr/slice)%s.filtered.length;
+    s.spinning=false;
+    document.getElementById(btnId).disabled=false;
+    drawWheel(key,landedIdx);
+    showResult(key, s.filtered[landedIdx]);
+    doConfetti(key);
+  }
+  requestAnimationFrame(animate);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RESULT DISPLAY
+// ═══════════════════════════════════════════════════════════════════
+function showResult(key, item) {
+  const card = document.getElementById({act:'actResult',place:'placeResult',food:'foodResult'}[key]);
+
+  if (key==='act') {
+    const emoji = ACT_EMOJI[item.category]||'🎉';
+    document.getElementById('actREmoji').textContent=emoji;
+    document.getElementById('actRName').textContent=item.title;
+    document.getElementById('actRInstr').textContent=item.instructions;
+    document.getElementById('actRMat').textContent=item.materials;
+    document.getElementById('actRBadges').innerHTML=`
+      <span class="rbadge">${emoji} ${item.category}</span>
+      <span class="rbadge">⏱ ${item.duration} min</span>
+      <span class="rbadge">📍 ${item.indoorOutdoor}</span>`;
+  }
+
+  if (key==='place') {
+    const emoji = PLACE_EMOJI[item.category]||'🎉';
+    document.getElementById('plREmoji').textContent=emoji;
+    document.getElementById('plRName').textContent=item.name;
+    document.getElementById('plRArea').textContent=item.area;
+    document.getElementById('plRDrive').textContent=item.driveTime;
+    document.getElementById('plRAge').textContent=item.ageRange;
+    document.getElementById('plRDesc').textContent=item.description;
+    const lc=item.freeOrPaid.toLowerCase();
+    const isFree=lc.includes('free')||lc.includes('donation');
+    document.getElementById('plRBadges').innerHTML=`
+      <span class="rbadge">${emoji} ${item.category}</span>
+      <span class="rbadge">${isFree?'✅ Free':'💳 Paid'} · ${item.freeOrPaid}</span>
+      <span class="rbadge">🌤 ${item.indoorOutdoor}</span>`;
+    const actions=document.getElementById('plActions');
+    actions.innerHTML='';
+    if(item.website){const a=document.createElement('a');a.href=item.website;a.target='_blank';a.rel='noopener';a.className='raction';a.textContent='🔗 Website';actions.appendChild(a);}
+    if(item.address&&!item.address.includes('Multiple')){const a=document.createElement('a');a.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`;a.target='_blank';a.rel='noopener';a.className='raction';a.textContent='📍 Maps';actions.appendChild(a);}
+  }
+
+  if (key==='food') {
+    const emoji = FOOD_EMOJI[item.cuisine.trim()]||'🍽️';
+    document.getElementById('foodREmoji').textContent=emoji;
+    document.getElementById('foodRName').textContent=item.name;
+    document.getElementById('foodRNbr').textContent=item.neighborhood;
+    document.getElementById('foodRCui').textContent=item.cuisine;
+    document.getElementById('foodRDesc').textContent=item.description;
+    document.getElementById('foodRBadges').innerHTML=`
+      <span class="rbadge">${emoji} ${item.cuisine}</span>
+      <span class="rbadge">📍 ${item.neighborhood}</span>`;
+    const actions=document.getElementById('foodActions');
+    actions.innerHTML='';
+    if(item.website){const a=document.createElement('a');a.href=item.website;a.target='_blank';a.rel='noopener';a.className='raction';a.textContent='🔗 Order Online';actions.appendChild(a);}
+  }
+
+  card.classList.remove('show'); void card.offsetWidth; card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════════════════════════════
+const CONFETTI_COLORS = {
+  act:   ['#4ADE80','#FACC15','#86EFAC','#ffffff','#a3e635'],
+  place: ['#60A5FA','#F472B6','#93C5FD','#ffffff','#c4b5fd'],
+  food:  ['#F97316','#FCD34D','#FB923C','#ffffff','#fde68a']
+};
+
+function doConfetti(key) {
+  const canvas=document.getElementById('confetti');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const colors=CONFETTI_COLORS[key];
+  const particles=Array.from({length:80},()=>({
+    x:Math.random()*canvas.width, y:-10-Math.random()*80,
+    vx:(Math.random()-0.5)*6, vy:2+Math.random()*5,
+    rot:Math.random()*360, rotV:(Math.random()-0.5)*12,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    w:5+Math.random()*10, h:3+Math.random()*6
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rotV;p.vy+=0.09;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+    });
+    if(++frame<140)requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  requestAnimationFrame(draw);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
+buildAllFilters();
+drawAll();
+window.addEventListener('resize', drawAll);
+</script>
 </body>
 </html>
